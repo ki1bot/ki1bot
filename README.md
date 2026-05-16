@@ -10,7 +10,7 @@
 
 ###
 
-<h4 align="center">I am a Bachelor's student majoring in Information Systems at Gunadarma University.</h4>
+<h3 align="center">I am a Bachelor's student majoring in Information Systems at Gunadarma University.</h4>
 
 ###
 
