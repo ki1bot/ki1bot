@@ -14,10 +14,6 @@
 
 ###
 
-<p align="left">📫 How to reach me rfqiii1511@gmail.com</p>
-
-###
-
 <div align="left">
   <a href="https://www.instagram.com/ki1bot_?igsh=M3o2OTdvb2Q1eXI1" target="_blank">
     <img src="https://raw.githubusercontent.com/maurodesouza/profile-readme-generator/master/src/assets/icons/social/instagram/default.svg" width="52" height="40" alt="instagram logo"  />
