@@ -10,6 +10,8 @@
 
 ###
 
+<br clear="both">
+
 <h4 align="center">I am a Bachelor's student majoring in Information Systems at Gunadarma University.</h4>
 
 ###
@@ -37,15 +39,31 @@
   <img width="17" />
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" height="42" alt="typescript logo"  />
   <img width="17" />
+  <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" height="42" alt="tailwindcss logo"  />
+  <img width="17" />
+  <img src="https://cdn.simpleicons.org/react/61DAFB" height="42" alt="react logo"  />
+  <img width="17" />
+  <img src="https://skillicons.dev/icons?i=nodejs" height="42" alt="nodejs logo"  />
+  <img width="17" />
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" height="42" alt="php logo"  />
   <img width="17" />
-  <img src="https://skillicons.dev/icons?i=py" height="42" alt="python logo"  />
+  <img src="https://cdn.simpleicons.org/laravel/FF2D20" height="42" alt="laravel logo"  />
+  <img width="17" />
+  <img src="https://cdn.simpleicons.org/codeigniter/EF4223" height="42" alt="codeigniter logo"  />
+  <img width="17" />
+  <img src="https://skillicons.dev/icons?i=dart" height="42" alt="dart logo"  />
+  <img width="17" />
+  <img src="https://skillicons.dev/icons?i=flutter" height="42" alt="flutter logo"  />
   <img width="17" />
   <img src="https://cdn.simpleicons.org/go/00ADD8" height="42" alt="go logo"  />
   <img width="17" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" height="42" alt="java logo"  />
+  <img src="https://skillicons.dev/icons?i=postgres" height="42" alt="postgresql logo"  />
   <img width="17" />
-  <img src="https://skillicons.dev/icons?i=dart" height="42" alt="dart logo"  />
+  <img src="https://cdn.simpleicons.org/mongodb/47A248" height="42" alt="mongodb logo"  />
+  <img width="17" />
+  <img src="https://cdn.simpleicons.org/mysql/4479A1" height="42" alt="mysql logo"  />
+  <img width="17" />
+  <img src="https://skillicons.dev/icons?i=supabase" height="42" alt="supabase logo"  />
 </div>
 
 ###
