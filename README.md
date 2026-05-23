@@ -56,14 +56,6 @@
   <img src="https://skillicons.dev/icons?i=flutter" height="42" alt="flutter logo"  />
   <img width="17" />
   <img src="https://cdn.simpleicons.org/go/00ADD8" height="42" alt="go logo"  />
-  <img width="17" />
-  <img src="https://skillicons.dev/icons?i=postgres" height="42" alt="postgresql logo"  />
-  <img width="17" />
-  <img src="https://cdn.simpleicons.org/mongodb/47A248" height="42" alt="mongodb logo"  />
-  <img width="17" />
-  <img src="https://cdn.simpleicons.org/mysql/4479A1" height="42" alt="mysql logo"  />
-  <img width="17" />
-  <img src="https://skillicons.dev/icons?i=supabase" height="42" alt="supabase logo"  />
 </div>
 
 ###
