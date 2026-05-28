@@ -69,8 +69,8 @@
 ###
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/stats-output/stats.svg" height="100" alt="stats graph"  />
-  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/languages-output/languages.svg" height="100" alt="languages graph"  />
+  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/stats-output/stats.svg" height="150" alt="stats graph"  />
+  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/languages-output/languages.svg" height="150" alt="languages graph"  />
 </div>
 
 ###
