@@ -7,21 +7,18 @@ on:
   push:
     branches:
       - main
-    paths:
-      - ".github/workflows/generate-languages.yml"
-      - "README.md"
 
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     permissions:
       contents: write
 
     steps:
       - name: Generate languages SVG
-        uses: stats-organization/github-readme-stats-action@v2
+        uses: readme-tools/github-readme-stats-action@v1
         with:
           card: top-langs
           options: username=${{ github.repository_owner }}&locale=en&hide_title=false&layout=compact&card_width=320&langs_count=6&theme=dracula&hide_border=false

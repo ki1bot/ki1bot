@@ -7,9 +7,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - ".github/workflows/generate-pacman.yml"
-      - "README.md"
 
 jobs:
   generate:
