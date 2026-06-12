@@ -6,7 +6,7 @@
 
 ###
 
-<h2 align="center">Hello 👋, I'm Rifqi and I'm a Fullstack Web/Mobile Apps Developer</h2>
+<h2 align="center">Hello 👋, I'm Rifqi and I'm a Fullstack Web Dev/Mobile Apps Developer</h2>
 
 ###
 
