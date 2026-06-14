@@ -61,8 +61,8 @@
 ###
 
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=ki1bot&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000" height="150" alt="stats graph" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs?username=ki1bot&layout=compact&theme=tokyonight&hide_border=true&bg_color=00000000" height="150" alt="languages graph" />
+  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/stats-output/stats.svg" height="150" alt="stats graph"  />
+  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/languages-output/languages.svg" height="150" alt="languages graph"  />
 </div>
 
 ###
