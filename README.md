@@ -10,20 +10,6 @@
 
 ###
 
-<div data-importer="socials" align="left">
-  <a href="https://www.instagram.com/ki1bot_?igsh=M3o2OTdvb2Q1eXI1" target="_blank">
-    <img src="https://raw.githubusercontent.com/maurodesouza/profile-readme-generator/master/src/assets/icons/social/instagram/default.svg" width="52" height="35" alt="instagram logo"  />
-  </a>
-  <a href="https://www.linkedin.com/in/rifq1?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank">
-    <img src="https://raw.githubusercontent.com/maurodesouza/profile-readme-generator/master/src/assets/icons/social/linkedin/default.svg" width="52" height="35" alt="linkedin logo"  />
-  </a>
-  <a href="https://open.spotify.com/user/314fig6hgrc2gaq7phryrrmfcp34?si=45c2f5e0cf9e4291" target="_blank">
-    <img src="https://raw.githubusercontent.com/maurodesouza/profile-readme-generator/master/src/assets/icons/social/spotify/default.svg" width="52" height="35" alt="spotify logo"  />
-  </a>
-</div>
-
-###
-
 <div data-importer="techs" align="left">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" height="35" alt="html5 logo"  />
   <img width="13" />
@@ -61,8 +47,8 @@
 ###
 
 <div data-importer="stats" align="center">
-  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/stats-output/stats.svg?hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=true&disable_animations=false&theme=dracula&locale=en&hide_border=false&order=1" height="150" alt="stats graph"  />
-  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/languages-output/languages.svg?locale=en&hide_title=false&layout=compact&card_width=320&langs_count=8&theme=dracula&hide_border=false&order=2" height="150" alt="languages graph"  />
+  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/stats-output/stats.svg?hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=true&disable_animations=false&theme=dracula&locale=en&hide_border=true&order=1" height="180" alt="stats graph"  />
+  <img src="https://raw.githubusercontent.com/ki1bot/ki1bot/languages-output/languages.svg?locale=en&hide_title=false&layout=compact&card_width=320&langs_count=8&theme=dracula&hide_border=true&order=2" height="180" alt="languages graph"  />
 </div>
 
 ###
