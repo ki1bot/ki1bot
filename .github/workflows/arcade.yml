@@ -2,7 +2,7 @@ name: Generate arcade animation
 
 on:
   schedule: # execute every 12 hours
-    - cron: "* */12 * * *"
+    - cron: "0 */12 * * *"
 
   workflow_dispatch:
 
@@ -10,21 +10,65 @@ on:
     branches:
       - main
 
+concurrency:
+  group: arcade-animation-${{ github.repository }}
+  cancel-in-progress: true
+
 jobs:
   generate:
     permissions:
       contents: write
+
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: generate pacman-contribution-graph.svg
-        uses: abozanona/pacman-contribution-graph@main
+        id: generate_1
+        continue-on-error: true
+        uses: abozanona/pacman-contribution-graph@v5.0.0
         with:
           github_user_name: ${{ github.repository_owner }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           games: "pacman"
 
+      - name: wait before first retry
+        if: steps.generate_1.outcome == 'failure'
+        shell: bash
+        run: sleep 30
+
+      - name: retry generate pacman-contribution-graph.svg
+        id: generate_2
+        if: steps.generate_1.outcome == 'failure'
+        continue-on-error: true
+        uses: abozanona/pacman-contribution-graph@v5.0.0
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          games: "pacman"
+
+      - name: wait before second retry
+        if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure'
+        shell: bash
+        run: sleep 60
+
+      - name: retry generate pacman-contribution-graph.svg again
+        id: generate_3
+        if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure'
+        continue-on-error: true
+        uses: abozanona/pacman-contribution-graph@v5.0.0
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          games: "pacman"
+
+      - name: fail when all generation attempts failed
+        if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure' && steps.generate_3.outcome == 'failure'
+        shell: bash
+        run: exit 1
+
       - name: push pacman-contribution-graph.svg to the output branch
+        if: steps.generate_1.outcome == 'success' || steps.generate_2.outcome == 'success' || steps.generate_3.outcome == 'success'
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: pacman-output
