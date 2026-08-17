@@ -24,15 +24,57 @@ jobs:
 
     steps:
       - name: Generate stats.svg
+        id: stats_1
+        continue-on-error: true
         uses: stats-organization/github-readme-stats-action@v2.0.2
         with:
           card: stats
-          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=true&disable_animations=false&theme=dracula&locale=en&hide_border=true
+          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=false&disable_animations=false&theme=dracula&locale=en&hide_border=true
           path: dist/stats.svg
-          token: ${{ secrets.GH_STATS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fail_on_error: true
 
+      - name: Wait before retry
+        if: steps.stats_1.outcome == 'failure'
+        shell: bash
+        run: sleep 30
+
+      - name: Retry generate stats.svg
+        id: stats_2
+        if: steps.stats_1.outcome == 'failure'
+        continue-on-error: true
+        uses: stats-organization/github-readme-stats-action@v2.0.2
+        with:
+          card: stats
+          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=false&disable_animations=false&theme=dracula&locale=en&hide_border=true
+          path: dist/stats.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_error: true
+
+      - name: Wait before final retry
+        if: steps.stats_1.outcome == 'failure' && steps.stats_2.outcome == 'failure'
+        shell: bash
+        run: sleep 60
+
+      - name: Final retry generate stats.svg
+        id: stats_3
+        if: steps.stats_1.outcome == 'failure' && steps.stats_2.outcome == 'failure'
+        continue-on-error: true
+        uses: stats-organization/github-readme-stats-action@v2.0.2
+        with:
+          card: stats
+          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=false&disable_animations=false&theme=dracula&locale=en&hide_border=true
+          path: dist/stats.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_error: true
+
+      - name: Fail if stats generation failed
+        if: steps.stats_1.outcome == 'failure' && steps.stats_2.outcome == 'failure' && steps.stats_3.outcome == 'failure'
+        shell: bash
+        run: exit 1
+
       - name: Push stats.svg to the output branch
+        if: steps.stats_1.outcome == 'success' || steps.stats_2.outcome == 'success' || steps.stats_3.outcome == 'success'
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: stats-output
