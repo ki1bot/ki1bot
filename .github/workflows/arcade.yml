@@ -9,10 +9,8 @@ on:
   push:
     branches:
       - main
-
-concurrency:
-  group: arcade-animation-${{ github.repository }}
-  cancel-in-progress: true
+    paths:
+      - ".github/workflows/arcade.yml"
 
 jobs:
   generate:
@@ -23,7 +21,7 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: generate pacman-contribution-graph.svg
+      - name: Generate pacman contribution graph
         id: generate_1
         continue-on-error: true
         uses: abozanona/pacman-contribution-graph@v5.0.0
@@ -32,12 +30,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           games: "pacman"
 
-      - name: wait before first retry
+      - name: Wait before retry
         if: steps.generate_1.outcome == 'failure'
         shell: bash
         run: sleep 30
 
-      - name: retry generate pacman-contribution-graph.svg
+      - name: Retry pacman contribution graph
         id: generate_2
         if: steps.generate_1.outcome == 'failure'
         continue-on-error: true
@@ -47,12 +45,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           games: "pacman"
 
-      - name: wait before second retry
+      - name: Wait before final retry
         if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure'
         shell: bash
         run: sleep 60
 
-      - name: retry generate pacman-contribution-graph.svg again
+      - name: Final retry pacman contribution graph
         id: generate_3
         if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure'
         continue-on-error: true
@@ -62,13 +60,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           games: "pacman"
 
-      - name: fail when all generation attempts failed
-        if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure' && steps.generate_3.outcome == 'failure'
+      - name: Keep previous pacman graph
+        if: always() && steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure' && steps.generate_3.outcome == 'failure'
         shell: bash
-        run: exit 1
+        run: echo "::warning::GitHub contribution data is temporarily unavailable. Keeping the previous pacman graph."
 
-      - name: push pacman-contribution-graph.svg to the output branch
-        if: steps.generate_1.outcome == 'success' || steps.generate_2.outcome == 'success' || steps.generate_3.outcome == 'success'
+      - name: Push pacman contribution graph
+        if: always() && (steps.generate_1.outcome == 'success' || steps.generate_2.outcome == 'success' || steps.generate_3.outcome == 'success')
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: pacman-output
