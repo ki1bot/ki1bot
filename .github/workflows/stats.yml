@@ -1,4 +1,4 @@
-name: Generate stats card
+name: Generate arcade animation
 
 on:
   schedule: # execute every 12 hours
@@ -11,7 +11,7 @@ on:
       - main
 
 concurrency:
-  group: stats-card-${{ github.repository }}
+  group: arcade-animation-${{ github.repository }}
   cancel-in-progress: true
 
 jobs:
@@ -20,64 +20,58 @@ jobs:
       contents: write
 
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
-      - name: Generate stats.svg
-        id: stats_1
+      - name: Generate pacman contribution graph
+        id: generate_1
         continue-on-error: true
-        uses: stats-organization/github-readme-stats-action@v2.0.2
+        uses: abozanona/pacman-contribution-graph@v5.0.0
         with:
-          card: stats
-          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=false&disable_animations=false&theme=dracula&locale=en&hide_border=true
-          path: dist/stats.svg
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fail_on_error: true
+          github_user_name: ${{ github.repository_owner }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          games: "pacman"
 
-      - name: Wait before retry
-        if: steps.stats_1.outcome == 'failure'
+      - name: Wait before first retry
+        if: steps.generate_1.outcome == 'failure'
         shell: bash
         run: sleep 30
 
-      - name: Retry generate stats.svg
-        id: stats_2
-        if: steps.stats_1.outcome == 'failure'
+      - name: Retry pacman contribution graph
+        id: generate_2
+        if: steps.generate_1.outcome == 'failure'
         continue-on-error: true
-        uses: stats-organization/github-readme-stats-action@v2.0.2
+        uses: abozanona/pacman-contribution-graph@v5.0.0
         with:
-          card: stats
-          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=false&disable_animations=false&theme=dracula&locale=en&hide_border=true
-          path: dist/stats.svg
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fail_on_error: true
+          github_user_name: ${{ github.repository_owner }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          games: "pacman"
 
       - name: Wait before final retry
-        if: steps.stats_1.outcome == 'failure' && steps.stats_2.outcome == 'failure'
+        if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure'
         shell: bash
         run: sleep 60
 
-      - name: Final retry generate stats.svg
-        id: stats_3
-        if: steps.stats_1.outcome == 'failure' && steps.stats_2.outcome == 'failure'
+      - name: Final retry pacman contribution graph
+        id: generate_3
+        if: steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure'
         continue-on-error: true
-        uses: stats-organization/github-readme-stats-action@v2.0.2
+        uses: abozanona/pacman-contribution-graph@v5.0.0
         with:
-          card: stats
-          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=false&disable_animations=false&theme=dracula&locale=en&hide_border=true
-          path: dist/stats.svg
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fail_on_error: true
+          github_user_name: ${{ github.repository_owner }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          games: "pacman"
 
-      - name: Fail if stats generation failed
-        if: steps.stats_1.outcome == 'failure' && steps.stats_2.outcome == 'failure' && steps.stats_3.outcome == 'failure'
+      - name: Keep previous pacman graph
+        if: always() && steps.generate_1.outcome == 'failure' && steps.generate_2.outcome == 'failure' && steps.generate_3.outcome == 'failure'
         shell: bash
-        run: exit 1
+        run: echo "::warning::GitHub GraphQL is temporarily unavailable. Keeping the previous pacman-output."
 
-      - name: Push stats.svg to the output branch
-        if: steps.stats_1.outcome == 'success' || steps.stats_2.outcome == 'success' || steps.stats_3.outcome == 'success'
+      - name: Push pacman contribution graph
+        if: always() && (steps.generate_1.outcome == 'success' || steps.generate_2.outcome == 'success' || steps.generate_3.outcome == 'success')
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
-          target_branch: stats-output
+          target_branch: pacman-output
           build_dir: dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
