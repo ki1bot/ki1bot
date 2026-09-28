@@ -1,32 +1,271 @@
-name: Generate stats card
+name: Generate GitHub stats card
 
 on:
   schedule: # execute every 12 hours
-    - cron: "* */12 * * *"
-
+    - cron: "17 */6 * * *"
   workflow_dispatch:
-
   push:
     branches:
       - main
+    paths:
+      - ".github/workflows/stats.yml"
 
 jobs:
   generate:
     permissions:
       contents: write
+
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+
+    env:
+      GITHUB_OWNER: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: generate stats.svg
-        uses: readme-tools/github-readme-stats-action@v1
-        with:
-          card: stats
-          options: username=${{ github.repository_owner }}&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=false&count_private=true&disable_animations=false&theme=dracula&locale=en&hide_border=false
-          path: dist/stats.svg
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate stats.svg
+        shell: bash
+        run: |
+          mkdir -p dist
+          python <<'PY'
+          import html
+          import json
+          import os
+          import re
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from datetime import datetime, timedelta, timezone
 
-      - name: push stats.svg to the output branch
+          owner = os.environ["GITHUB_OWNER"]
+          github_token = os.environ.get("GITHUB_TOKEN", "").strip()
+
+          def make_request(url, token=None):
+              headers = {
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "User-Agent": "ki1bot-profile-stats",
+              }
+
+              if token:
+                  headers["Authorization"] = f"Bearer {token}"
+
+              return urllib.request.Request(url, headers=headers)
+
+          def api(path, params=None, allowed_statuses=()):
+              query = ""
+
+              if params:
+                  query = "?" + urllib.parse.urlencode(params)
+
+              url = f"https://api.github.com{path}{query}"
+
+              tokens = [github_token, None] if github_token else [None]
+              last_error = None
+
+              for token in tokens:
+                  try:
+                      with urllib.request.urlopen(
+                          make_request(url, token),
+                          timeout=30,
+                      ) as response:
+                          payload = response.read().decode("utf-8")
+                          data = json.loads(payload) if payload else None
+                          return data, response.headers
+                  except urllib.error.HTTPError as error:
+                      if error.code in allowed_statuses:
+                          payload = error.read().decode("utf-8")
+                          data = json.loads(payload) if payload else None
+                          return data, error.headers
+
+                      last_error = error
+
+                      if token and error.code in (401, 403, 404):
+                          continue
+
+                      raise
+
+              if last_error:
+                  raise last_error
+
+              raise RuntimeError("GitHub API request failed")
+
+          def load_repositories():
+              repositories = []
+              page = 1
+
+              while True:
+                  data, _ = api(
+                      f"/users/{urllib.parse.quote(owner)}/repos",
+                      {
+                          "type": "owner",
+                          "sort": "updated",
+                          "direction": "desc",
+                          "per_page": 100,
+                          "page": page,
+                      },
+                  )
+
+                  if not data:
+                      break
+
+                  repositories.extend(
+                      repository
+                      for repository in data
+                      if not repository.get("fork", False)
+                  )
+
+                  if len(data) < 100:
+                      break
+
+                  page += 1
+
+              return repositories
+
+          def count_commits(repository, since=None):
+              params = {
+                  "author": owner,
+                  "per_page": 1,
+              }
+
+              if since:
+                  params["since"] = since
+
+              data, headers = api(
+                  f"/repos/{urllib.parse.quote(owner)}/{urllib.parse.quote(repository)}/commits",
+                  params,
+                  allowed_statuses=(409,),
+              )
+
+              if not isinstance(data, list) or not data:
+                  return 0
+
+              link = headers.get("Link", "")
+
+              match = re.search(
+                  r'[?&]page=(\d+)[^>]*>; rel="last"',
+                  link,
+              )
+
+              if match:
+                  return int(match.group(1))
+
+              return 1
+
+          def search_total(query):
+              data, _ = api(
+                  "/search/issues",
+                  {
+                      "q": query,
+                      "per_page": 1,
+                  },
+              )
+
+              return int(data.get("total_count", 0))
+
+          repositories = load_repositories()
+
+          repository_names = [
+              repository["name"]
+              for repository in repositories
+          ]
+
+          repository_count = len(repositories)
+
+          total_stars = sum(
+              int(repository.get("stargazers_count", 0))
+              for repository in repositories
+          )
+
+          total_commits = sum(
+              count_commits(repository_name)
+              for repository_name in repository_names
+          )
+
+          one_year_ago = (
+              datetime.now(timezone.utc) - timedelta(days=365)
+          ).replace(
+              microsecond=0
+          ).isoformat().replace(
+              "+00:00",
+              "Z",
+          )
+
+          contributed_last_year = sum(
+              1
+              for repository_name in repository_names
+              if count_commits(
+                  repository_name,
+                  one_year_ago,
+              ) > 0
+          )
+
+          total_prs = search_total(
+              f"author:{owner} is:pr"
+          )
+
+          total_issues = search_total(
+              f"author:{owner} is:issue"
+          )
+
+          profile, _ = api(
+              f"/users/{urllib.parse.quote(owner)}"
+          )
+
+          display_name = html.escape(
+              profile.get("name") or owner
+          )
+
+          rows = [
+              ("Total Stars Earned:", total_stars),
+              ("Total Commits:", total_commits),
+              ("Total PRs:", total_prs),
+              ("Total Issues:", total_issues),
+              ("Contributed to (last year):", contributed_last_year),
+          ]
+
+          row_svg = []
+
+          for index, (label, value) in enumerate(rows):
+              y = 70 + index * 25
+
+              row_svg.append(
+                  f'<text x="25" y="{y}" class="label">'
+                  f'{html.escape(label)}'
+                  f'</text>'
+                  f'<text x="225" y="{y}" class="value">'
+                  f'{value}'
+                  f'</text>'
+              )
+
+          svg = f'''<svg width="467" height="195" viewBox="0 0 467 195" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="titleId descId">
+          <title id="titleId">{display_name}'s GitHub Stats</title>
+          <desc id="descId">Stars {total_stars}, commits {total_commits}, pull requests {total_prs}, issues {total_issues}, repositories contributed to in the last year {contributed_last_year}</desc>
+          <style>
+            .header {{ font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #ff6e96; }}
+            .label {{ font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #f8f8f2; }}
+            .value {{ font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #f8f8f2; }}
+            .repo-count {{ font: 800 24px 'Segoe UI', Ubuntu, Sans-Serif; fill: #f8f8f2; }}
+            .repo-label {{ font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: #f8f8f2; }}
+          </style>
+          <rect x="0.5" y="0.5" width="466" height="194" rx="4.5" fill="#282a36" stroke="#e4e2e2" stroke-opacity="0"/>
+          <text x="25" y="35" class="header">{display_name}'s GitHub Stats</text>
+          {''.join(row_svg)}
+          <circle cx="385" cy="105" r="40" fill="none" stroke="#ff6e96" stroke-width="6" stroke-opacity="0.22"/>
+          <circle cx="385" cy="105" r="40" fill="none" stroke="#ff6e96" stroke-width="6" stroke-linecap="round" stroke-dasharray="220 32" transform="rotate(-90 385 105)"/>
+          <text x="385" y="103" text-anchor="middle" dominant-baseline="middle" class="repo-count">{repository_count}</text>
+          <text x="385" y="127" text-anchor="middle" class="repo-label">repos</text>
+          </svg>'''
+
+          with open(
+              "dist/stats.svg",
+              "w",
+              encoding="utf-8",
+          ) as file:
+              file.write(svg)
+          PY
+
+      - name: Push stats.svg to output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: stats-output
