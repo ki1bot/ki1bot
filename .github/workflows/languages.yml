@@ -2,36 +2,31 @@ name: Generate languages card
 
 on:
   schedule: # execute every 12 hours
-    - cron: "30 */6 * * *"
+    - cron: "* */12 * * *"
 
   workflow_dispatch:
 
   push:
     branches:
       - main
-    paths:
-      - ".github/workflows/languages.yml"
 
 jobs:
   generate:
     permissions:
       contents: write
-
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
 
     steps:
-      - name: Generate languages card
-        id: languages
+      - name: generate languages.svg
         uses: readme-tools/github-readme-stats-action@v1
         with:
           card: top-langs
           options: username=${{ github.repository_owner }}&locale=en&hide_title=false&layout=compact&card_width=320&langs_count=8&theme=dracula&hide_border=false
           path: dist/languages.svg
           token: ${{ secrets.GITHUB_TOKEN }}
-          fail_on_error: true
 
-      - name: Push languages card
+      - name: push languages.svg to the output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: languages-output
