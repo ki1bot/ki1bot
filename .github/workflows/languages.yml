@@ -29,6 +29,7 @@ jobs:
           options: username=${{ github.repository_owner }}&locale=en&hide_title=false&layout=compact&card_width=320&langs_count=8&theme=dracula&hide_border=false
           path: dist/languages.svg
           token: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_error: true
 
       - name: Push languages card
         uses: crazy-max/ghaction-github-pages@v3.1.0
